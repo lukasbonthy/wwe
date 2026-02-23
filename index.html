@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Selah Lounge</title>
+  <meta name="description" content="Selah Lounge — local demo for notes, prayer requests, and wins." />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme{
+      --color-selah-sky: oklch(0.77 0.12 220);
+      --color-selah-indigo: oklch(0.62 0.18 268);
+
+      --animate-pop: pop 160ms ease-out;
+      @keyframes pop { 0%{ transform:scale(.985); opacity:0 } 100%{ transform:scale(1); opacity:1 } }
+    }
+  </style>
+
+  <style>
+    .overlay{
+      background-image:
+        radial-gradient(700px 340px at 15% 15%, rgba(14,165,233,.18), transparent 60%),
+        radial-gradient(700px 340px at 85% 25%, rgba(99,102,241,.16), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
+    }
+  </style>
+</head>
+
+<body class="min-h-dvh bg-white text-slate-900">
+  <div class="pointer-events-none fixed inset-0 -z-10 overlay"></div>
+
+  <a href="#main"
+     class="sr-only focus:not-sr-only fixed left-4 top-4 z-50 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold
+            focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+    Skip to content
+  </a>
+
+  <header class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-7">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <a href="index.html" class="inline-flex items-center gap-3">
+        <span class="grid h-11 w-11 place-items-center rounded-2xl bg-slate-900 text-white shadow-sm">
+          <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+            <defs>
+              <linearGradient id="g2" x1="0" x2="1">
+                <stop offset="0" stop-color="#38bdf8"/>
+                <stop offset="0.5" stop-color="#6366f1"/>
+                <stop offset="1" stop-color="#22c55e"/>
+              </linearGradient>
+            </defs>
+            <rect x="3" y="4" width="4" height="14" rx="2" fill="url(#g2)"/>
+            <rect x="9" y="4" width="4" height="14" rx="2" fill="url(#g2)"/>
+            <path d="M17 5v12" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".88"/>
+            <path d="M14.6 11h4.8" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".88"/>
+          </svg>
+        </span>
+        <span class="leading-tight">
+          <span class="block text-lg font-semibold tracking-tight">Selah Lounge</span>
+          <span class="block text-sm text-slate-600">local demo • notes / prayer / wins</span>
+        </span>
+      </a>
+
+      <nav class="flex flex-wrap items-center gap-2 text-sm">
+        <a href="index.html"
+           class="rounded-full border border-slate-200 bg-white px-4 py-2 hover:bg-slate-50 transition
+                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+          ← Home
+        </a>
+        <button id="clearAll"
+           class="rounded-full border border-slate-200 bg-white px-4 py-2 hover:bg-slate-50 transition
+                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+          Clear (local)
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-16 pt-10">
+    <div class="grid gap-6 lg:grid-cols-5">
+
+      <!-- Left column -->
+      <section class="lg:col-span-2 space-y-6">
+        <!-- Nick -->
+        <div class="rounded-3xl border border-slate-200 bg-white/90 backdrop-blur p-6 shadow-sm">
+          <div class="text-xs font-semibold text-slate-500">YOU</div>
+          <div class="mt-1 text-lg font-semibold">Nickname</div>
+          <p class="mt-2 text-sm text-slate-700">First name only. Stored on this device.</p>
+
+          <label class="mt-4 block text-sm font-semibold" for="nick">Nickname</label>
+          <input id="nick" maxlength="18" placeholder="e.g., Jordan"
+                 class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none
+                        focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" />
+          <button id="saveNick"
+            class="mt-3 w-full rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-95 transition
+                   focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+            Save
+          </button>
+
+          <div id="nickToast"
+            class="mt-3 hidden rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
+            role="status" aria-live="polite">
+            Saved 🙂
+          </div>
+        </div>
+
+        <!-- Pinned topic -->
+        <div class="rounded-3xl border border-slate-200 bg-white/90 backdrop-blur p-6 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="text-xs font-semibold text-slate-500">PINNED TOPIC</div>
+              <div class="mt-1 text-lg font-semibold" id="topicView">—</div>
+              <p class="mt-2 text-sm text-slate-700">Keep it one sentence. (Local demo)</p>
+            </div>
+            <span class="rounded-2xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white">PIN</span>
+          </div>
+
+          <label class="mt-4 block text-sm font-semibold" for="topic">Edit topic</label>
+          <textarea id="topic" rows="3" maxlength="200"
+            class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none
+                   focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2"
+            placeholder="Example: What helps you stay grounded when school is stressful?"></textarea>
+
+          <div class="mt-3 flex gap-2">
+            <button id="saveTopic"
+              class="flex-1 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition
+                     focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+              Save
+            </button>
+            <button id="resetTopic"
+              class="flex-1 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold hover:bg-slate-50 transition
+                     focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+              Reset
+            </button>
+          </div>
+        </div>
+
+        <!-- Rules -->
+        <div class="rounded-3xl border border-slate-200 bg-white/90 backdrop-blur p-6 shadow-sm">
+          <div class="text-xs font-semibold text-slate-500">RULES</div>
+          <ul class="mt-3 space-y-2 text-sm text-slate-800">
+            <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-900"></span> be kind • no roasting</li>
+            <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-900"></span> no last names • no private info</li>
+            <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-900"></span> school-appropriate only</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Right column -->
+      <section class="lg:col-span-3">
+        <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white/90 backdrop-blur shadow-sm">
+          <!-- top controls -->
+          <div class="border-b border-slate-200 p-6">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <div class="text-xs font-semibold text-slate-500">SELah LOUNGE</div>
+                <div class="mt-1 text-xl font-semibold tracking-tight">Club feed</div>
+                <p class="mt-1 text-sm text-slate-700">Local demo (stored on this device).</p>
+              </div>
+
+              <div class="flex flex-col gap-2 sm:items-end">
+                <div class="text-xs text-slate-600" id="countLabel">0 posts</div>
+                <div class="inline-flex rounded-2xl border border-slate-200 bg-white p-1">
+                  <button class="tabBtn px-4 py-2 text-sm font-semibold rounded-xl bg-sky-600 text-white" data-tab="notes">Notes</button>
+                  <button class="tabBtn px-4 py-2 text-sm font-semibold rounded-xl text-slate-700 hover:bg-slate-50" data-tab="prayer">Prayer</button>
+                  <button class="tabBtn px-4 py-2 text-sm font-semibold rounded-xl text-slate-700 hover:bg-slate-50" data-tab="wins">Wins</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 grid gap-3 sm:grid-cols-2">
+              <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div class="text-xs font-semibold text-slate-500">POSTING AS</div>
+                <div class="mt-1 text-sm font-semibold" id="whoami">—</div>
+              </div>
+              <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                <div class="text-xs font-semibold text-slate-500">FILTER</div>
+                <input id="search" placeholder="search your local feed…"
+                  class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none
+                         focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- feed -->
+          <div class="p-6">
+            <div id="feed" role="log" aria-live="polite" aria-relevant="additions"
+                 class="max-h-[52vh] space-y-3 overflow-auto pr-1"></div>
+
+            <form id="form" class="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">
+              <div>
+                <label class="text-sm font-semibold" for="msg">New post</label>
+                <textarea id="msg" rows="3" maxlength="240"
+                  class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none
+                         focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2"
+                  placeholder="Write something… (Enter posts, Shift+Enter new line)"></textarea>
+
+                <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
+                  <span id="tabHint">Category: Notes</span>
+                  <span id="limit">0/240</span>
+                </div>
+              </div>
+
+              <div class="sm:pt-7">
+                <button id="send" type="submit"
+                  class="inline-flex w-full items-center justify-center rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-95 transition
+                         hover:-translate-y-0.5 active:translate-y-0 active:scale-[.99]
+                         disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none
+                         focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+                  Post
+                </button>
+
+                <button id="clearFeed" type="button"
+                  class="mt-3 inline-flex w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold hover:bg-slate-50 transition
+                         focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+                  Clear tab (local)
+                </button>
+              </div>
+            </form>
+
+            <div id="warn"
+              class="mt-4 hidden rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+              role="status" aria-live="polite">
+              Please set a nickname first (first name only).
+            </div>
+          </div>
+        </div>
+
+        <p class="mt-4 text-xs text-slate-600">
+          Upgrade later: Node.js + Socket.io (real-time), officers-only topic edits, moderation tools.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const KEY_NICK  = "selah:nick";
+    const KEY_TOPIC = "selah:topic";
+    const KEY_FEED  = "selah:feed:v2";
+    const defaultTopic = "What’s one thing you’re carrying this week — and what would peace look like?";
+
+    const nickEl = document.getElementById("nick");
+    const saveNickBtn = document.getElementById("saveNick");
+    const nickToast = document.getElementById("nickToast");
+
+    const topicEl = document.getElementById("topic");
+    const topicView = document.getElementById("topicView");
+    const saveTopicBtn = document.getElementById("saveTopic");
+    const resetTopicBtn = document.getElementById("resetTopic");
+
+    const feedEl = document.getElementById("feed");
+    const countLabel = document.getElementById("countLabel");
+    const whoami = document.getElementById("whoami");
+
+    const form = document.getElementById("form");
+    const msgEl = document.getElementById("msg");
+    const sendBtn = document.getElementById("send");
+    const limit = document.getElementById("limit");
+    const warn = document.getElementById("warn");
+
+    const clearFeedBtn = document.getElementById("clearFeed");
+    const clearAllBtn = document.getElementById("clearAll");
+    const searchEl = document.getElementById("search");
+
+    const tabHint = document.getElementById("tabHint");
+    const tabBtns = [...document.querySelectorAll(".tabBtn")];
+
+    let activeTab = "notes"; // notes | prayer | wins
+
+    function safeParse(v, fallback){ try { return JSON.parse(v); } catch { return fallback; } }
+    function nowLabel(){
+      const d = new Date();
+      return d.toLocaleString([], { month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+    }
+    function toast(el){
+      el.classList.remove("hidden");
+      el.classList.add("motion-safe:animate-pop");
+      setTimeout(()=> el.classList.add("hidden"), 1400);
+    }
+
+    function loadNick(){
+      const v = (localStorage.getItem(KEY_NICK) || "").trim().slice(0,18);
+      nickEl.value = v;
+      whoami.textContent = v ? `Posting as: ${v}` : "—";
+      return v;
+    }
+
+    function loadTopic(){
+      const t = (localStorage.getItem(KEY_TOPIC) || defaultTopic).trim().slice(0,200) || defaultTopic;
+      topicEl.value = t;
+      topicView.textContent = t;
+      return t;
+    }
+
+    function getFeed(){
+      return safeParse(localStorage.getItem(KEY_FEED) || "[]", []);
+    }
+    function setFeed(items){
+      localStorage.setItem(KEY_FEED, JSON.stringify(items));
+    }
+
+    function applyTabUI(){
+      tabBtns.forEach(b => {
+        const on = b.dataset.tab === activeTab;
+        b.className = "tabBtn px-4 py-2 text-sm font-semibold rounded-xl transition " + (on
+          ? "bg-sky-600 text-white"
+          : "text-slate-700 hover:bg-slate-50");
+      });
+      tabHint.textContent = "Category: " + (activeTab === "notes" ? "Notes" : activeTab === "prayer" ? "Prayer" : "Wins");
+      msgEl.placeholder =
+        activeTab === "notes" ? "Note for the club…"
+        : activeTab === "prayer" ? "Prayer request (keep it general)…"
+        : "Share a win / gratitude…";
+    }
+
+    function filteredItems(){
+      const q = (searchEl.value || "").trim().toLowerCase();
+      return getFeed()
+        .filter(x => x.tab === activeTab)
+        .filter(x => !q || (x.text + " " + x.name).toLowerCase().includes(q));
+    }
+
+    function renderFeed({scrollToEnd=false}={}){
+      const items = filteredItems();
+      feedEl.innerHTML = "";
+
+      if (!items.length){
+        const empty = document.createElement("div");
+        empty.className = "rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700";
+        empty.textContent =
+          activeTab === "notes" ? "No notes yet. Start simple: “Topic idea: ___”"
+          : activeTab === "prayer" ? "No prayer requests yet. Keep it general and respectful."
+          : "No wins yet. Drop something you’re grateful for.";
+        feedEl.appendChild(empty);
+      } else {
+        for (const it of items){
+          const card = document.createElement("div");
+          card.className = "rounded-2xl border border-slate-200 bg-white p-4 shadow-sm motion-safe:animate-pop motion-reduce:animate-none";
+
+          const top = document.createElement("div");
+          top.className = "flex items-start justify-between gap-4";
+
+          const left = document.createElement("div");
+
+          const name = document.createElement("div");
+          name.className = "text-sm font-semibold text-slate-900";
+          name.textContent = it.name || "Someone";
+
+          const meta = document.createElement("div");
+          meta.className = "mt-1 text-xs text-slate-500";
+          meta.textContent = `${it.time || ""} • ${it.tab}`;
+
+          const text = document.createElement("div");
+          text.className = "mt-3 text-sm/7 text-slate-800 whitespace-pre-wrap";
+          text.textContent = it.text || "";
+
+          left.appendChild(name);
+          left.appendChild(meta);
+          left.appendChild(text);
+
+          const right = document.createElement("div");
+          right.className = "flex flex-col items-end gap-2";
+
+          const reacts = document.createElement("div");
+          reacts.className = "flex items-center gap-2";
+
+          const likeBtn = document.createElement("button");
+          likeBtn.type = "button";
+          likeBtn.className = "rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold hover:bg-slate-50 transition";
+          likeBtn.textContent = `🙏 ${it.pray || 0}`;
+
+          const heartBtn = document.createElement("button");
+          heartBtn.type = "button";
+          heartBtn.className = "rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold hover:bg-slate-50 transition";
+          heartBtn.textContent = `💛 ${it.heart || 0}`;
+
+          likeBtn.addEventListener("click", () => {
+            const all = getFeed();
+            const idx = all.findIndex(x => x.id === it.id);
+            if (idx >= 0){ all[idx].pray = (all[idx].pray || 0) + 1; setFeed(all); renderFeed(); }
+          });
+          heartBtn.addEventListener("click", () => {
+            const all = getFeed();
+            const idx = all.findIndex(x => x.id === it.id);
+            if (idx >= 0){ all[idx].heart = (all[idx].heart || 0) + 1; setFeed(all); renderFeed(); }
+          });
+
+          reacts.appendChild(likeBtn);
+          reacts.appendChild(heartBtn);
+          right.appendChild(reacts);
+
+          top.appendChild(left);
+          top.appendChild(right);
+
+          card.appendChild(top);
+          feedEl.appendChild(card);
+        }
+      }
+
+      const totalTab = getFeed().filter(x => x.tab === activeTab).length;
+      countLabel.textContent = `${totalTab} post${totalTab === 1 ? "" : "s"} in ${activeTab}`;
+
+      if (scrollToEnd) feedEl.scrollTop = feedEl.scrollHeight;
+    }
+
+    // init
+    loadNick();
+    loadTopic();
+    applyTabUI();
+    renderFeed({scrollToEnd:true});
+
+    // inputs
+    function updateLimit(){
+      limit.textContent = `${(msgEl.value || "").length}/240`;
+      sendBtn.disabled = !(msgEl.value || "").trim();
+    }
+    updateLimit();
+
+    msgEl.addEventListener("input", updateLimit);
+    searchEl.addEventListener("input", () => renderFeed());
+
+    tabBtns.forEach(btn => btn.addEventListener("click", () => {
+      activeTab = btn.dataset.tab;
+      applyTabUI();
+      msgEl.value = "";
+      updateLimit();
+      renderFeed({scrollToEnd:true});
+    }));
+
+    // save nick/topic
+    saveNickBtn.addEventListener("click", () => {
+      const v = (nickEl.value || "").trim().slice(0,18);
+      localStorage.setItem(KEY_NICK, v);
+      loadNick();
+      toast(nickToast);
+    });
+
+    saveTopicBtn.addEventListener("click", () => {
+      const v = (topicEl.value || "").trim().slice(0,200) || defaultTopic;
+      localStorage.setItem(KEY_TOPIC, v);
+      loadTopic();
+    });
+
+    resetTopicBtn.addEventListener("click", () => {
+      localStorage.setItem(KEY_TOPIC, defaultTopic);
+      loadTopic();
+    });
+
+    // post
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = loadNick();
+      if (!name){
+        warn.classList.remove("hidden");
+        setTimeout(() => warn.classList.add("hidden"), 2000);
+        nickEl.focus();
+        return;
+      }
+      const text = (msgEl.value || "").trim().slice(0,240);
+      if (!text) return;
+
+      const all = getFeed();
+      all.push({
+        id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2),
+        tab: activeTab,
+        name,
+        text,
+        time: nowLabel(),
+        pray: 0,
+        heart: 0
+      });
+      setFeed(all);
+
+      msgEl.value = "";
+      updateLimit();
+      renderFeed({scrollToEnd:true});
+    });
+
+    // Enter submits, Shift+Enter new line
+    msgEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey){
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+
+    // clears
+    clearFeedBtn.addEventListener("click", () => {
+      const all = getFeed().filter(x => x.tab !== activeTab);
+      setFeed(all);
+      renderFeed({scrollToEnd:true});
+    });
+
+    clearAllBtn.addEventListener("click", () => {
+      localStorage.removeItem(KEY_FEED);
+      localStorage.removeItem(KEY_TOPIC);
+      // keep nick optionally, but clearing all means clear it:
+      localStorage.removeItem(KEY_NICK);
+      loadNick();
+      loadTopic();
+      renderFeed({scrollToEnd:true});
+    });
+  </script>
+</body>
+</html>
