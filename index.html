@@ -3,504 +3,721 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Selah Lounge</title>
-  <meta name="description" content="Selah Lounge — local demo for notes, prayer requests, and wins." />
+  <title>Selah — Student Christian Club</title>
+  <meta name="description" content="Selah is a student Christian club: a calm place to breathe, grow, and connect." />
   <meta name="theme-color" content="#0ea5e9" />
 
+  <!-- Tailwind (CDN prototype) -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
   <style type="text/tailwindcss">
     @theme{
       --color-selah-sky: oklch(0.77 0.12 220);
       --color-selah-indigo: oklch(0.62 0.18 268);
+      --color-selah-mint: oklch(0.88 0.10 160);
+      --color-selah-sun: oklch(0.92 0.12 90);
 
+      --animate-float: float 7.5s ease-in-out infinite;
+      --animate-shift: shift 10s linear infinite;
       --animate-pop: pop 160ms ease-out;
+      --animate-glow: glow 2.8s ease-in-out infinite;
+      --animate-reveal: reveal 600ms cubic-bezier(.2,.9,.2,1) both;
+
+      @keyframes float { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-10px) } }
+      @keyframes shift { 0%{ background-position: 0% 50% } 100%{ background-position: 100% 50% } }
       @keyframes pop { 0%{ transform:scale(.985); opacity:0 } 100%{ transform:scale(1); opacity:1 } }
+      @keyframes glow { 0%,100%{ opacity:.45 } 50%{ opacity:.85 } }
+      @keyframes reveal { 0%{ transform: translateY(14px); opacity:0 } 100%{ transform: translateY(0); opacity:1 } }
     }
   </style>
 
   <style>
-    .overlay{
+    /* stained-glass-ish overlay (pure CSS) */
+    .glass-overlay{
       background-image:
-        radial-gradient(700px 340px at 15% 15%, rgba(14,165,233,.18), transparent 60%),
-        radial-gradient(700px 340px at 85% 25%, rgba(99,102,241,.16), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.78));
+        radial-gradient(700px 340px at 15% 15%, rgba(14,165,233,.22), transparent 60%),
+        radial-gradient(700px 340px at 85% 25%, rgba(99,102,241,.20), transparent 60%),
+        radial-gradient(700px 340px at 45% 85%, rgba(34,197,94,.18), transparent 60%),
+        linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.75));
+    }
+    .pattern{
+      background-image:
+        linear-gradient(to right, rgba(2,6,23,.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(2,6,23,.05) 1px, transparent 1px);
+      background-size: 54px 54px;
+      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,.9), rgba(0,0,0,.2) 60%, transparent 75%);
+    }
+    .shine::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
+      transform: translateX(-120%);
+      animation: shift 3.6s ease-in-out infinite;
+      opacity:.35;
+      pointer-events:none;
+      border-radius: 999px;
+    }
+    .reveal{
+      opacity:0;
+      transform: translateY(14px);
+    }
+    .reveal.is-in{
+      animation: reveal 650ms cubic-bezier(.2,.9,.2,1) both;
     }
   </style>
 </head>
 
 <body class="min-h-dvh bg-white text-slate-900">
-  <div class="pointer-events-none fixed inset-0 -z-10 overlay"></div>
+  <!-- Background -->
+  <div class="pointer-events-none fixed inset-0 -z-10">
+    <div class="absolute inset-0 glass-overlay"></div>
+    <div class="absolute inset-0 pattern opacity-55"></div>
 
+    <!-- floating blobs -->
+    <div class="absolute -top-24 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full
+                bg-gradient-to-r from-sky-200 via-indigo-200 to-emerald-200 blur-3xl opacity-70
+                motion-safe:animate-float"></div>
+    <div class="absolute -bottom-40 -left-40 h-[520px] w-[520px] rounded-full
+                bg-gradient-to-tr from-amber-100 via-rose-100 to-sky-100 blur-3xl opacity-65
+                motion-safe:animate-float" style="animation-delay:-2.2s"></div>
+  </div>
+
+  <!-- Skip link -->
   <a href="#main"
      class="sr-only focus:not-sr-only fixed left-4 top-4 z-50 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold
             focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
     Skip to content
   </a>
 
+  <!-- Top bar -->
   <header class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-7">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <a href="index.html" class="inline-flex items-center gap-3">
-        <span class="grid h-11 w-11 place-items-center rounded-2xl bg-slate-900 text-white shadow-sm">
+      <a href="index.html" class="group inline-flex items-center gap-3">
+        <!-- Icon -->
+        <span class="relative grid h-11 w-11 place-items-center rounded-2xl bg-slate-900 text-white shadow-sm">
+          <!-- Selah mark: pause + cross, brighter -->
           <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
             <defs>
-              <linearGradient id="g2" x1="0" x2="1">
+              <linearGradient id="g" x1="0" x2="1">
                 <stop offset="0" stop-color="#38bdf8"/>
                 <stop offset="0.5" stop-color="#6366f1"/>
                 <stop offset="1" stop-color="#22c55e"/>
               </linearGradient>
             </defs>
-            <rect x="3" y="4" width="4" height="14" rx="2" fill="url(#g2)"/>
-            <rect x="9" y="4" width="4" height="14" rx="2" fill="url(#g2)"/>
+            <rect x="3" y="4" width="4" height="14" rx="2" fill="url(#g)"/>
+            <rect x="9" y="4" width="4" height="14" rx="2" fill="url(#g)"/>
             <path d="M17 5v12" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".88"/>
             <path d="M14.6 11h4.8" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".88"/>
           </svg>
+          <span class="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-white"></span>
         </span>
+
         <span class="leading-tight">
-          <span class="block text-lg font-semibold tracking-tight">Selah Lounge</span>
-          <span class="block text-sm text-slate-600">local demo • notes / prayer / wins</span>
+          <span class="block text-lg font-semibold tracking-tight">Selah</span>
+          <span class="block text-sm text-slate-600">Student Christian Club</span>
         </span>
       </a>
 
       <nav class="flex flex-wrap items-center gap-2 text-sm">
-        <a href="index.html"
-           class="rounded-full border border-slate-200 bg-white px-4 py-2 hover:bg-slate-50 transition
-                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-          ← Home
+        <a class="rounded-full border border-slate-200 bg-white/80 backdrop-blur px-4 py-2 hover:bg-white transition
+                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" href="#what">
+          What we do
         </a>
-        <button id="clearAll"
-           class="rounded-full border border-slate-200 bg-white px-4 py-2 hover:bg-slate-50 transition
-                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-          Clear (local)
-        </button>
+        <a class="rounded-full border border-slate-200 bg-white/80 backdrop-blur px-4 py-2 hover:bg-white transition
+                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" href="#meet">
+          Meetings
+        </a>
+        <a class="rounded-full border border-slate-200 bg-white/80 backdrop-blur px-4 py-2 hover:bg-white transition
+                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" href="#join">
+          Join
+        </a>
+        <a class="rounded-full bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 transition
+                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" href="lounge.html">
+          Lounge →
+        </a>
       </nav>
     </div>
   </header>
 
   <main id="main" class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-16 pt-10">
-    <div class="grid gap-6 lg:grid-cols-5">
 
-      <!-- Left column -->
-      <section class="lg:col-span-2 space-y-6">
-        <!-- Nick -->
-        <div class="rounded-3xl border border-slate-200 bg-white/90 backdrop-blur p-6 shadow-sm">
-          <div class="text-xs font-semibold text-slate-500">YOU</div>
-          <div class="mt-1 text-lg font-semibold">Nickname</div>
-          <p class="mt-2 text-sm text-slate-700">First name only. Stored on this device.</p>
+    <!-- HERO -->
+    <section class="reveal grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div>
+        <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm text-slate-700 backdrop-blur">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+          calm • real • student-led
+          <span class="mx-1 h-1 w-1 rounded-full bg-slate-300"></span>
+          <span class="text-slate-500">club-first (not a chat app)</span>
+        </div>
 
-          <label class="mt-4 block text-sm font-semibold" for="nick">Nickname</label>
-          <input id="nick" maxlength="18" placeholder="e.g., Jordan"
-                 class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none
-                        focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" />
-          <button id="saveNick"
-            class="mt-3 w-full rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-95 transition
+        <h1 class="mt-5 text-4xl sm:text-5xl font-semibold tracking-tight">
+          A brighter place to
+          <span class="bg-gradient-to-r from-sky-600 via-indigo-600 to-emerald-600 bg-clip-text text-transparent
+                       bg-[length:200%_200%] motion-safe:animate-shift motion-reduce:animate-none">
+            pause
+          </span>
+          and grow.
+        </h1>
+
+        <p class="mt-4 max-w-prose text-base/7 text-slate-700">
+          Selah is a student Christian club for teens who want a safe, chill space at school to talk about faith and real life.
+          You can show up to listen, share, or just breathe.
+        </p>
+
+        <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+          <button id="openJoin"
+            class="relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white
+                   shadow-sm hover:shadow-md hover:-translate-y-0.5 transition active:translate-y-0 active:scale-[.99]
                    focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-            Save
+            <span class="relative z-10">Join Selah</span>
+            <span class="relative z-10">✨</span>
+            <span class="absolute inset-0 shine"></span>
           </button>
 
-          <div id="nickToast"
-            class="mt-3 hidden rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
-            role="status" aria-live="polite">
-            Saved 🙂
+          <a href="#what"
+            class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold
+                   hover:bg-white hover:-translate-y-0.5 transition active:translate-y-0 active:scale-[.99] backdrop-blur
+                   focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+            What we do
+            <span>↓</span>
+          </a>
+        </div>
+
+        <div class="mt-6 grid gap-3 sm:grid-cols-3">
+          <div class="rounded-2xl border border-slate-200 bg-white/85 p-4 backdrop-blur">
+            <div class="text-xs font-semibold text-slate-500">VIBE</div>
+            <div class="mt-1 font-semibold">No pressure</div>
+            <div class="mt-1 text-xs text-slate-600">listen or talk</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white/85 p-4 backdrop-blur">
+            <div class="text-xs font-semibold text-slate-500">FOCUS</div>
+            <div class="mt-1 font-semibold">Jesus + life</div>
+            <div class="mt-1 text-xs text-slate-600">real convos</div>
+          </div>
+          <div class="rounded-2xl border border-slate-200 bg-white/85 p-4 backdrop-blur">
+            <div class="text-xs font-semibold text-slate-500">FORMAT</div>
+            <div class="mt-1 font-semibold">Short topic</div>
+            <div class="mt-1 text-xs text-slate-600">then talk</div>
           </div>
         </div>
 
-        <!-- Pinned topic -->
-        <div class="rounded-3xl border border-slate-200 bg-white/90 backdrop-blur p-6 shadow-sm">
+        <p class="mt-3 text-xs text-slate-500">
+          Meeting day / room / sponsor: <span class="font-semibold">unspecified</span> (edit below).
+        </p>
+      </div>
+
+      <!-- HERO CARD: verse + countdown -->
+      <div class="reveal relative">
+        <div class="rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
           <div class="flex items-start justify-between gap-4">
             <div>
-              <div class="text-xs font-semibold text-slate-500">PINNED TOPIC</div>
-              <div class="mt-1 text-lg font-semibold" id="topicView">—</div>
-              <p class="mt-2 text-sm text-slate-700">Keep it one sentence. (Local demo)</p>
+              <div class="text-xs font-semibold text-slate-500">VERSE OF THE WEEK</div>
+              <div id="verseText" class="mt-2 text-lg font-semibold tracking-tight text-slate-900">
+                “Be still, and know that I am God.”
+              </div>
+              <div id="verseRef" class="mt-1 text-sm text-slate-600">Psalm 46:10</div>
             </div>
-            <span class="rounded-2xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white">PIN</span>
+            <span class="rounded-2xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white">
+              SELAH
+            </span>
           </div>
 
-          <label class="mt-4 block text-sm font-semibold" for="topic">Edit topic</label>
-          <textarea id="topic" rows="3" maxlength="200"
-            class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none
-                   focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2"
-            placeholder="Example: What helps you stay grounded when school is stressful?"></textarea>
+          <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div class="flex items-center justify-between">
+              <div class="text-xs font-semibold text-slate-500">NEXT MEETING</div>
+              <div class="text-xs text-slate-500" id="meetingLabel">Unspecified</div>
+            </div>
+            <div class="mt-2 flex items-center justify-between">
+              <div class="text-sm text-slate-700">Countdown</div>
+              <div class="text-sm font-semibold text-slate-900" id="countdown">—</div>
+            </div>
+            <div class="mt-3 h-2 w-full rounded-full bg-slate-200 overflow-hidden">
+              <div id="cdBar" class="h-full w-[20%] rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-emerald-500"></div>
+            </div>
+            <div class="mt-2 text-xs text-slate-500">
+              This is a demo countdown (set your real meeting day/time in the JS).
+            </div>
+          </div>
 
-          <div class="mt-3 flex gap-2">
-            <button id="saveTopic"
-              class="flex-1 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition
+          <div class="mt-5 flex flex-wrap gap-2">
+            <button id="copyPoster"
+              class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50 transition
+                     focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+              📋 Copy poster line
+            </button>
+            <a href="lounge.html"
+              class="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition
+                     focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+              Open Lounge →
+            </a>
+          </div>
+        </div>
+
+        <div class="pointer-events-none absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-r from-sky-100 via-indigo-100 to-emerald-100 blur-2xl opacity-80"></div>
+      </div>
+    </section>
+
+    <!-- WHAT WE DO -->
+    <section id="what" class="mt-14">
+      <div class="reveal flex items-end justify-between gap-6">
+        <div>
+          <h2 class="text-2xl font-semibold tracking-tight">What we do</h2>
+          <p class="mt-2 max-w-prose text-base/7 text-slate-700">
+            Selah isn’t a “perfect people” club. It’s a place to be honest, learn, and encourage each other.
+          </p>
+        </div>
+        <div class="hidden sm:flex items-center gap-2 text-xs text-slate-600">
+          <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+          welcoming
+        </div>
+      </div>
+
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm
+                    transition hover:-translate-y-1 hover:shadow-md">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500">WEEKLY</span>
+            <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">chill</span>
+          </div>
+          <div class="mt-3 text-lg font-semibold">Short topic + real conversation</div>
+          <p class="mt-2 text-sm/7 text-slate-700">
+            We pick something real (stress, habits, identity, relationships) and connect it to Scripture.
+          </p>
+        </div>
+
+        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm
+                    transition hover:-translate-y-1 hover:shadow-md">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500">OPTIONAL</span>
+            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">safe</span>
+          </div>
+          <div class="mt-3 text-lg font-semibold">Prayer requests</div>
+          <p class="mt-2 text-sm/7 text-slate-700">
+            You can share out loud or write it down. No last names, no private details.
+          </p>
+        </div>
+
+        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm
+                    transition hover:-translate-y-1 hover:shadow-md">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500">ALWAYS</span>
+            <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">growth</span>
+          </div>
+          <div class="mt-3 text-lg font-semibold">Encouragement</div>
+          <p class="mt-2 text-sm/7 text-slate-700">
+            We try to leave people better than we found them: kindness, truth, hope.
+          </p>
+        </div>
+      </div>
+
+      <!-- SELAH MOMENT -->
+      <div class="reveal mt-6 rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div class="text-xs font-semibold text-slate-500">A SELAH MOMENT</div>
+            <div class="mt-2 text-lg font-semibold tracking-tight">60 seconds of silence</div>
+            <p class="mt-1 text-sm text-slate-700">Just to reset your mind before we talk.</p>
+          </div>
+          <div class="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white">
+            “pause” > “perform”
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEETINGS -->
+    <section id="meet" class="mt-14">
+      <div class="reveal">
+        <h2 class="text-2xl font-semibold tracking-tight">Meetings</h2>
+        <p class="mt-2 text-sm/7 text-slate-700">
+          Update these once you know the details.
+        </p>
+      </div>
+
+      <div class="mt-6 grid gap-4 lg:grid-cols-3">
+        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+          <div class="text-xs font-semibold text-slate-500">DAY</div>
+          <div id="mDay" class="mt-2 text-lg font-semibold">Unspecified</div>
+        </div>
+        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+          <div class="text-xs font-semibold text-slate-500">ROOM</div>
+          <div id="mRoom" class="mt-2 text-lg font-semibold">Unspecified</div>
+        </div>
+        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+          <div class="text-xs font-semibold text-slate-500">SPONSOR</div>
+          <div id="mSponsor" class="mt-2 text-lg font-semibold">Unspecified</div>
+        </div>
+      </div>
+
+      <!-- mini timeline -->
+      <div class="reveal mt-6 rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+        <div class="flex items-center justify-between">
+          <div class="text-lg font-semibold">Typical meeting flow</div>
+          <div class="text-xs text-slate-600">~25–35 min</div>
+        </div>
+        <div class="mt-5 grid gap-3 md:grid-cols-4">
+          <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+            <div class="text-xs font-semibold text-slate-500">01</div>
+            <div class="mt-1 font-semibold">Selah moment</div>
+            <div class="mt-1 text-xs text-slate-600">silence / breath</div>
+          </div>
+          <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+            <div class="text-xs font-semibold text-slate-500">02</div>
+            <div class="mt-1 font-semibold">Topic</div>
+            <div class="mt-1 text-xs text-slate-600">short + real</div>
+          </div>
+          <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+            <div class="text-xs font-semibold text-slate-500">03</div>
+            <div class="mt-1 font-semibold">Talk</div>
+            <div class="mt-1 text-xs text-slate-600">small groups</div>
+          </div>
+          <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+            <div class="text-xs font-semibold text-slate-500">04</div>
+            <div class="mt-1 font-semibold">Wrap</div>
+            <div class="mt-1 text-xs text-slate-600">prayer optional</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JOIN -->
+    <section id="join" class="mt-14">
+      <div class="reveal">
+        <h2 class="text-2xl font-semibold tracking-tight">Join Selah</h2>
+        <p class="mt-2 max-w-prose text-base/7 text-slate-700">
+          Pick a nickname (first name only). It saves on this device and shows in the Lounge demo.
+        </p>
+      </div>
+
+      <div class="mt-6 grid gap-4 lg:grid-cols-3">
+        <div class="reveal lg:col-span-2 rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+          <label class="text-sm font-semibold" for="nick">Nickname</label>
+          <div class="mt-2 flex flex-col gap-3 sm:flex-row">
+            <input id="nick" maxlength="18" autocomplete="off" placeholder="e.g., Jordan"
+              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none
+                     focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" />
+            <button id="saveNick"
+              class="relative overflow-hidden inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white
+                     hover:bg-slate-800 transition hover:-translate-y-0.5 active:translate-y-0 active:scale-[.99]
                      focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
               Save
             </button>
-            <button id="resetTopic"
-              class="flex-1 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold hover:bg-slate-50 transition
-                     focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-              Reset
-            </button>
+          </div>
+
+          <div id="toast"
+            class="mt-4 hidden rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
+            role="status" aria-live="polite">
+            Saved 🙂
+          </div>
+
+          <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+            <div class="font-semibold">Quick rules</div>
+            <div class="mt-1 text-slate-600">No last names • No personal info • School-appropriate • Be kind</div>
           </div>
         </div>
 
-        <!-- Rules -->
-        <div class="rounded-3xl border border-slate-200 bg-white/90 backdrop-blur p-6 shadow-sm">
-          <div class="text-xs font-semibold text-slate-500">RULES</div>
-          <ul class="mt-3 space-y-2 text-sm text-slate-800">
-            <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-900"></span> be kind • no roasting</li>
-            <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-900"></span> no last names • no private info</li>
-            <li class="flex gap-2"><span class="mt-2 h-1.5 w-1.5 rounded-full bg-slate-900"></span> school-appropriate only</li>
-          </ul>
+        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+          <div class="text-xs font-semibold text-slate-500">NEXT STEP</div>
+          <div class="mt-2 text-lg font-semibold">Open the Lounge</div>
+          <p class="mt-2 text-sm/7 text-slate-700">
+            The Lounge is a secondary tool for notes/prayer/wins (local demo).
+          </p>
+          <a href="lounge.html"
+             class="mt-4 inline-flex w-full items-center justify-center rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white
+                    hover:opacity-95 transition hover:-translate-y-0.5 active:translate-y-0 active:scale-[.99]
+                    focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+            Go to Lounge →
+          </a>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- Right column -->
-      <section class="lg:col-span-3">
-        <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white/90 backdrop-blur shadow-sm">
-          <!-- top controls -->
-          <div class="border-b border-slate-200 p-6">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <div class="text-xs font-semibold text-slate-500">SELah LOUNGE</div>
-                <div class="mt-1 text-xl font-semibold tracking-tight">Club feed</div>
-                <p class="mt-1 text-sm text-slate-700">Local demo (stored on this device).</p>
-              </div>
+    <!-- FAQ -->
+    <section class="mt-14">
+      <div class="reveal">
+        <h2 class="text-2xl font-semibold tracking-tight">FAQ</h2>
+        <p class="mt-2 text-sm text-slate-700">Quick answers for people at the club fair.</p>
+      </div>
 
-              <div class="flex flex-col gap-2 sm:items-end">
-                <div class="text-xs text-slate-600" id="countLabel">0 posts</div>
-                <div class="inline-flex rounded-2xl border border-slate-200 bg-white p-1">
-                  <button class="tabBtn px-4 py-2 text-sm font-semibold rounded-xl bg-sky-600 text-white" data-tab="notes">Notes</button>
-                  <button class="tabBtn px-4 py-2 text-sm font-semibold rounded-xl text-slate-700 hover:bg-slate-50" data-tab="prayer">Prayer</button>
-                  <button class="tabBtn px-4 py-2 text-sm font-semibold rounded-xl text-slate-700 hover:bg-slate-50" data-tab="wins">Wins</button>
-                </div>
-              </div>
-            </div>
+      <div class="mt-6 grid gap-4 lg:grid-cols-2">
+        <details class="reveal group rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+          <summary class="cursor-pointer list-none flex items-center justify-between font-semibold">
+            Do I have to talk?
+            <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+          </summary>
+          <p class="mt-3 text-sm/7 text-slate-700">
+            Nope. You can just listen. You won’t get called out.
+          </p>
+        </details>
 
-            <div class="mt-4 grid gap-3 sm:grid-cols-2">
-              <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div class="text-xs font-semibold text-slate-500">POSTING AS</div>
-                <div class="mt-1 text-sm font-semibold" id="whoami">—</div>
-              </div>
-              <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div class="text-xs font-semibold text-slate-500">FILTER</div>
-                <input id="search" placeholder="search your local feed…"
-                  class="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none
-                         focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2"/>
-              </div>
-            </div>
-          </div>
+        <details class="reveal group rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+          <summary class="cursor-pointer list-none flex items-center justify-between font-semibold">
+            What if I’m not sure what I believe?
+            <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+          </summary>
+          <p class="mt-3 text-sm/7 text-slate-700">
+            You’re welcome. Questions are normal here.
+          </p>
+        </details>
 
-          <!-- feed -->
-          <div class="p-6">
-            <div id="feed" role="log" aria-live="polite" aria-relevant="additions"
-                 class="max-h-[52vh] space-y-3 overflow-auto pr-1"></div>
+        <details class="reveal group rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+          <summary class="cursor-pointer list-none flex items-center justify-between font-semibold">
+            Is this mostly a chat site?
+            <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+          </summary>
+          <p class="mt-3 text-sm/7 text-slate-700">
+            No — the homepage is the main thing. The Lounge is just a small tool (notes/prayer/wins).
+          </p>
+        </details>
 
-            <form id="form" class="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">
-              <div>
-                <label class="text-sm font-semibold" for="msg">New post</label>
-                <textarea id="msg" rows="3" maxlength="240"
-                  class="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none
-                         focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2"
-                  placeholder="Write something… (Enter posts, Shift+Enter new line)"></textarea>
+        <details class="reveal group rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
+          <summary class="cursor-pointer list-none flex items-center justify-between font-semibold">
+            What’s “Selah” mean?
+            <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
+          </summary>
+          <p class="mt-3 text-sm/7 text-slate-700">
+            It’s a pause—like a breath in music or Psalms. We use it as a reminder to slow down.
+          </p>
+        </details>
+      </div>
+    </section>
 
-                <div class="mt-2 flex items-center justify-between text-xs text-slate-500">
-                  <span id="tabHint">Category: Notes</span>
-                  <span id="limit">0/240</span>
-                </div>
-              </div>
-
-              <div class="sm:pt-7">
-                <button id="send" type="submit"
-                  class="inline-flex w-full items-center justify-center rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-95 transition
-                         hover:-translate-y-0.5 active:translate-y-0 active:scale-[.99]
-                         disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-none
-                         focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-                  Post
-                </button>
-
-                <button id="clearFeed" type="button"
-                  class="mt-3 inline-flex w-full items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold hover:bg-slate-50 transition
-                         focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-                  Clear tab (local)
-                </button>
-              </div>
-            </form>
-
-            <div id="warn"
-              class="mt-4 hidden rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
-              role="status" aria-live="polite">
-              Please set a nickname first (first name only).
-            </div>
-          </div>
+    <footer class="mt-16 text-xs text-slate-500">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <p>© <span id="year"></span> Selah</p>
+        <div class="flex items-center gap-2">
+          <button id="openJoin2" class="underline decoration-sky-300 underline-offset-4 hover:text-slate-700">Join</button>
+          <span class="text-slate-300">•</span>
+          <a class="underline decoration-sky-300 underline-offset-4 hover:text-slate-700" href="lounge.html">Lounge</a>
         </div>
-
-        <p class="mt-4 text-xs text-slate-600">
-          Upgrade later: Node.js + Socket.io (real-time), officers-only topic edits, moderation tools.
-        </p>
-      </section>
-    </div>
+      </div>
+    </footer>
   </main>
 
+  <!-- JOIN MODAL -->
+  <div id="joinModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/35 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <div class="text-xs font-semibold text-slate-500">JOIN SELAH</div>
+          <div class="mt-1 text-xl font-semibold tracking-tight">Quick setup</div>
+          <p class="mt-2 text-sm text-slate-700">Pick a nickname (first name only). Saved on this device.</p>
+        </div>
+        <button id="closeJoin"
+          class="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-50 transition
+                 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">✕</button>
+      </div>
+
+      <div class="mt-5 grid gap-3">
+        <label class="text-sm font-semibold" for="nickModal">Nickname</label>
+        <input id="nickModal" maxlength="18" placeholder="e.g., Jordan"
+          class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none
+                 focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" />
+
+        <div class="flex gap-2">
+          <button id="saveNickModal"
+            class="flex-1 rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-95 transition
+                   focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+            Save
+          </button>
+          <a href="lounge.html"
+            class="flex-1 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition text-center
+                   focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
+            Lounge →
+          </a>
+        </div>
+
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
+          Rule: no last names • no personal info • be kind
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- tiny toast -->
+  <div id="tinyToast"
+       class="fixed left-1/2 bottom-5 z-50 hidden -translate-x-1/2 rounded-2xl bg-slate-900 px-4 py-3 text-xs font-semibold text-white shadow-lg">
+    Copied ✅
+  </div>
+
   <script>
-    const KEY_NICK  = "selah:nick";
-    const KEY_TOPIC = "selah:topic";
-    const KEY_FEED  = "selah:feed:v2";
-    const defaultTopic = "What’s one thing you’re carrying this week — and what would peace look like?";
+    // -----------------------------
+    // Scroll reveal
+    // -----------------------------
+    const revealEls = [...document.querySelectorAll(".reveal")];
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add("is-in");
+      });
+    }, { threshold: 0.14 });
+    revealEls.forEach(el => io.observe(el));
 
-    const nickEl = document.getElementById("nick");
-    const saveNickBtn = document.getElementById("saveNick");
-    const nickToast = document.getElementById("nickToast");
-
-    const topicEl = document.getElementById("topic");
-    const topicView = document.getElementById("topicView");
-    const saveTopicBtn = document.getElementById("saveTopic");
-    const resetTopicBtn = document.getElementById("resetTopic");
-
-    const feedEl = document.getElementById("feed");
-    const countLabel = document.getElementById("countLabel");
-    const whoami = document.getElementById("whoami");
-
-    const form = document.getElementById("form");
-    const msgEl = document.getElementById("msg");
-    const sendBtn = document.getElementById("send");
-    const limit = document.getElementById("limit");
-    const warn = document.getElementById("warn");
-
-    const clearFeedBtn = document.getElementById("clearFeed");
-    const clearAllBtn = document.getElementById("clearAll");
-    const searchEl = document.getElementById("search");
-
-    const tabHint = document.getElementById("tabHint");
-    const tabBtns = [...document.querySelectorAll(".tabBtn")];
-
-    let activeTab = "notes"; // notes | prayer | wins
-
-    function safeParse(v, fallback){ try { return JSON.parse(v); } catch { return fallback; } }
-    function nowLabel(){
-      const d = new Date();
-      return d.toLocaleString([], { month:"short", day:"2-digit", hour:"2-digit", minute:"2-digit" });
-    }
-    function toast(el){
-      el.classList.remove("hidden");
-      el.classList.add("motion-safe:animate-pop");
-      setTimeout(()=> el.classList.add("hidden"), 1400);
-    }
+    // -----------------------------
+    // Nick storage
+    // -----------------------------
+    const KEY_NICK = "selah:nick";
+    const nick = document.getElementById("nick");
+    const saveNick = document.getElementById("saveNick");
+    const toast = document.getElementById("toast");
 
     function loadNick(){
       const v = (localStorage.getItem(KEY_NICK) || "").trim().slice(0,18);
-      nickEl.value = v;
-      whoami.textContent = v ? `Posting as: ${v}` : "—";
+      if (nick) nick.value = v;
+      const nm = document.getElementById("nickModal");
+      if (nm) nm.value = v;
       return v;
     }
-
-    function loadTopic(){
-      const t = (localStorage.getItem(KEY_TOPIC) || defaultTopic).trim().slice(0,200) || defaultTopic;
-      topicEl.value = t;
-      topicView.textContent = t;
-      return t;
+    function showToast(el){
+      el.classList.remove("hidden");
+      setTimeout(() => el.classList.add("hidden"), 1400);
     }
-
-    function getFeed(){
-      return safeParse(localStorage.getItem(KEY_FEED) || "[]", []);
-    }
-    function setFeed(items){
-      localStorage.setItem(KEY_FEED, JSON.stringify(items));
-    }
-
-    function applyTabUI(){
-      tabBtns.forEach(b => {
-        const on = b.dataset.tab === activeTab;
-        b.className = "tabBtn px-4 py-2 text-sm font-semibold rounded-xl transition " + (on
-          ? "bg-sky-600 text-white"
-          : "text-slate-700 hover:bg-slate-50");
-      });
-      tabHint.textContent = "Category: " + (activeTab === "notes" ? "Notes" : activeTab === "prayer" ? "Prayer" : "Wins");
-      msgEl.placeholder =
-        activeTab === "notes" ? "Note for the club…"
-        : activeTab === "prayer" ? "Prayer request (keep it general)…"
-        : "Share a win / gratitude…";
-    }
-
-    function filteredItems(){
-      const q = (searchEl.value || "").trim().toLowerCase();
-      return getFeed()
-        .filter(x => x.tab === activeTab)
-        .filter(x => !q || (x.text + " " + x.name).toLowerCase().includes(q));
-    }
-
-    function renderFeed({scrollToEnd=false}={}){
-      const items = filteredItems();
-      feedEl.innerHTML = "";
-
-      if (!items.length){
-        const empty = document.createElement("div");
-        empty.className = "rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700";
-        empty.textContent =
-          activeTab === "notes" ? "No notes yet. Start simple: “Topic idea: ___”"
-          : activeTab === "prayer" ? "No prayer requests yet. Keep it general and respectful."
-          : "No wins yet. Drop something you’re grateful for.";
-        feedEl.appendChild(empty);
-      } else {
-        for (const it of items){
-          const card = document.createElement("div");
-          card.className = "rounded-2xl border border-slate-200 bg-white p-4 shadow-sm motion-safe:animate-pop motion-reduce:animate-none";
-
-          const top = document.createElement("div");
-          top.className = "flex items-start justify-between gap-4";
-
-          const left = document.createElement("div");
-
-          const name = document.createElement("div");
-          name.className = "text-sm font-semibold text-slate-900";
-          name.textContent = it.name || "Someone";
-
-          const meta = document.createElement("div");
-          meta.className = "mt-1 text-xs text-slate-500";
-          meta.textContent = `${it.time || ""} • ${it.tab}`;
-
-          const text = document.createElement("div");
-          text.className = "mt-3 text-sm/7 text-slate-800 whitespace-pre-wrap";
-          text.textContent = it.text || "";
-
-          left.appendChild(name);
-          left.appendChild(meta);
-          left.appendChild(text);
-
-          const right = document.createElement("div");
-          right.className = "flex flex-col items-end gap-2";
-
-          const reacts = document.createElement("div");
-          reacts.className = "flex items-center gap-2";
-
-          const likeBtn = document.createElement("button");
-          likeBtn.type = "button";
-          likeBtn.className = "rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold hover:bg-slate-50 transition";
-          likeBtn.textContent = `🙏 ${it.pray || 0}`;
-
-          const heartBtn = document.createElement("button");
-          heartBtn.type = "button";
-          heartBtn.className = "rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold hover:bg-slate-50 transition";
-          heartBtn.textContent = `💛 ${it.heart || 0}`;
-
-          likeBtn.addEventListener("click", () => {
-            const all = getFeed();
-            const idx = all.findIndex(x => x.id === it.id);
-            if (idx >= 0){ all[idx].pray = (all[idx].pray || 0) + 1; setFeed(all); renderFeed(); }
-          });
-          heartBtn.addEventListener("click", () => {
-            const all = getFeed();
-            const idx = all.findIndex(x => x.id === it.id);
-            if (idx >= 0){ all[idx].heart = (all[idx].heart || 0) + 1; setFeed(all); renderFeed(); }
-          });
-
-          reacts.appendChild(likeBtn);
-          reacts.appendChild(heartBtn);
-          right.appendChild(reacts);
-
-          top.appendChild(left);
-          top.appendChild(right);
-
-          card.appendChild(top);
-          feedEl.appendChild(card);
-        }
-      }
-
-      const totalTab = getFeed().filter(x => x.tab === activeTab).length;
-      countLabel.textContent = `${totalTab} post${totalTab === 1 ? "" : "s"} in ${activeTab}`;
-
-      if (scrollToEnd) feedEl.scrollTop = feedEl.scrollHeight;
-    }
-
-    // init
     loadNick();
-    loadTopic();
-    applyTabUI();
-    renderFeed({scrollToEnd:true});
 
-    // inputs
-    function updateLimit(){
-      limit.textContent = `${(msgEl.value || "").length}/240`;
-      sendBtn.disabled = !(msgEl.value || "").trim();
+    saveNick?.addEventListener("click", () => {
+      const v = (nick.value || "").trim().slice(0,18);
+      localStorage.setItem(KEY_NICK, v);
+      showToast(toast);
+    });
+
+    // -----------------------------
+    // Join modal
+    // -----------------------------
+    const joinModal = document.getElementById("joinModal");
+    const openJoin = document.getElementById("openJoin");
+    const openJoin2 = document.getElementById("openJoin2");
+    const closeJoin = document.getElementById("closeJoin");
+    const saveNickModal = document.getElementById("saveNickModal");
+    const nickModal = document.getElementById("nickModal");
+
+    function openModal(){
+      joinModal.classList.remove("hidden");
+      joinModal.classList.add("flex");
+      loadNick();
+      setTimeout(() => nickModal?.focus(), 30);
     }
-    updateLimit();
+    function closeModal(){
+      joinModal.classList.add("hidden");
+      joinModal.classList.remove("flex");
+    }
+    openJoin?.addEventListener("click", openModal);
+    openJoin2?.addEventListener("click", openModal);
+    closeJoin?.addEventListener("click", closeModal);
+    joinModal?.addEventListener("click", (e) => {
+      if (e.target === joinModal) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !joinModal.classList.contains("hidden")) closeModal();
+    });
 
-    msgEl.addEventListener("input", updateLimit);
-    searchEl.addEventListener("input", () => renderFeed());
-
-    tabBtns.forEach(btn => btn.addEventListener("click", () => {
-      activeTab = btn.dataset.tab;
-      applyTabUI();
-      msgEl.value = "";
-      updateLimit();
-      renderFeed({scrollToEnd:true});
-    }));
-
-    // save nick/topic
-    saveNickBtn.addEventListener("click", () => {
-      const v = (nickEl.value || "").trim().slice(0,18);
+    saveNickModal?.addEventListener("click", () => {
+      const v = (nickModal.value || "").trim().slice(0,18);
       localStorage.setItem(KEY_NICK, v);
       loadNick();
-      toast(nickToast);
+      closeModal();
     });
 
-    saveTopicBtn.addEventListener("click", () => {
-      const v = (topicEl.value || "").trim().slice(0,200) || defaultTopic;
-      localStorage.setItem(KEY_TOPIC, v);
-      loadTopic();
-    });
+    // -----------------------------
+    // Verse rotator (simple + clean)
+    // -----------------------------
+    const verses = [
+      { t: "“Be still, and know that I am God.”", r: "Psalm 46:10" },
+      { t: "“Do not be anxious about anything…”", r: "Philippians 4:6" },
+      { t: "“Come to me… and I will give you rest.”", r: "Matthew 11:28" },
+      { t: "“The Lord is my shepherd; I shall not want.”", r: "Psalm 23:1" },
+    ];
+    const verseText = document.getElementById("verseText");
+    const verseRef = document.getElementById("verseRef");
+    let verseIndex = 0;
 
-    resetTopicBtn.addEventListener("click", () => {
-      localStorage.setItem(KEY_TOPIC, defaultTopic);
-      loadTopic();
-    });
+    setInterval(() => {
+      verseIndex = (verseIndex + 1) % verses.length;
+      if (!verseText || !verseRef) return;
+      verseText.style.opacity = 0;
+      verseRef.style.opacity = 0;
+      setTimeout(() => {
+        verseText.textContent = verses[verseIndex].t;
+        verseRef.textContent = verses[verseIndex].r;
+        verseText.style.opacity = 1;
+        verseRef.style.opacity = 1;
+      }, 160);
+    }, 6500);
 
-    // post
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = loadNick();
-      if (!name){
-        warn.classList.remove("hidden");
-        setTimeout(() => warn.classList.add("hidden"), 2000);
-        nickEl.focus();
-        return;
+    // -----------------------------
+    // Countdown demo (set real meeting time later)
+    // -----------------------------
+    const meetingLabel = document.getElementById("meetingLabel");
+    const countdown = document.getElementById("countdown");
+    const cdBar = document.getElementById("cdBar");
+
+    // Demo target: next Friday 12:00 (local device time)
+    function nextFridayNoon(){
+      const now = new Date();
+      const d = new Date(now);
+      const day = d.getDay(); // 0 Sun ... 5 Fri
+      const daysToFri = (5 - day + 7) % 7 || 7;
+      d.setDate(d.getDate() + daysToFri);
+      d.setHours(12,0,0,0);
+      return d;
+    }
+
+    const target = nextFridayNoon();
+    meetingLabel.textContent = "Demo: Friday @ 12:00";
+
+    function fmt(ms){
+      const s = Math.max(0, Math.floor(ms/1000));
+      const dd = Math.floor(s/86400);
+      const hh = Math.floor((s%86400)/3600);
+      const mm = Math.floor((s%3600)/60);
+      if (dd > 0) return `${dd}d ${hh}h ${mm}m`;
+      return `${hh}h ${mm}m`;
+    }
+
+    const total = target - new Date();
+    function tick(){
+      const now = new Date();
+      const diff = target - now;
+      countdown.textContent = diff <= 0 ? "Now ✅" : fmt(diff);
+
+      // progress bar (purely visual)
+      const pct = total > 0 ? Math.max(6, Math.min(100, 100 - (diff/total)*100)) : 100;
+      cdBar.style.width = pct.toFixed(0) + "%";
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    // -----------------------------
+    // Copy poster line
+    // -----------------------------
+    const tinyToast = document.getElementById("tinyToast");
+    async function copyText(t){
+      try{
+        await navigator.clipboard.writeText(t);
+      }catch{
+        const ta = document.createElement("textarea");
+        ta.value = t;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
       }
-      const text = (msgEl.value || "").trim().slice(0,240);
-      if (!text) return;
+      tinyToast.classList.remove("hidden");
+      setTimeout(()=> tinyToast.classList.add("hidden"), 1200);
+    }
 
-      const all = getFeed();
-      all.push({
-        id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2),
-        tab: activeTab,
-        name,
-        text,
-        time: nowLabel(),
-        pray: 0,
-        heart: 0
-      });
-      setFeed(all);
-
-      msgEl.value = "";
-      updateLimit();
-      renderFeed({scrollToEnd:true});
+    document.getElementById("copyPoster")?.addEventListener("click", () => {
+      copyText("Selah (Christian Club) — Lunch • Room ___ • Sponsor ___ • Come as you are.");
     });
 
-    // Enter submits, Shift+Enter new line
-    msgEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey){
-        e.preventDefault();
-        form.requestSubmit();
-      }
-    });
+    // -----------------------------
+    // Meetings placeholders (easy edit later)
+    // -----------------------------
+    document.getElementById("mDay").textContent = "Unspecified";
+    document.getElementById("mRoom").textContent = "Unspecified";
+    document.getElementById("mSponsor").textContent = "Unspecified";
 
-    // clears
-    clearFeedBtn.addEventListener("click", () => {
-      const all = getFeed().filter(x => x.tab !== activeTab);
-      setFeed(all);
-      renderFeed({scrollToEnd:true});
-    });
-
-    clearAllBtn.addEventListener("click", () => {
-      localStorage.removeItem(KEY_FEED);
-      localStorage.removeItem(KEY_TOPIC);
-      // keep nick optionally, but clearing all means clear it:
-      localStorage.removeItem(KEY_NICK);
-      loadNick();
-      loadTopic();
-      renderFeed({scrollToEnd:true});
-    });
+    document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
