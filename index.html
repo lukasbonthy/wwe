@@ -1,723 +1,339 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Selah — Student Christian Club</title>
-  <meta name="description" content="Selah is a student Christian club: a calm place to breathe, grow, and connect." />
-  <meta name="theme-color" content="#0ea5e9" />
+  <title>Selah (Sanctuary)</title>
+  <meta name="theme-color" content="#0b0b12" />
 
-  <!-- Tailwind (CDN prototype) -->
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <!-- External CSS: Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
-  <style type="text/tailwindcss">
-    @theme{
-      --color-selah-sky: oklch(0.77 0.12 220);
-      --color-selah-indigo: oklch(0.62 0.18 268);
-      --color-selah-mint: oklch(0.88 0.10 160);
-      --color-selah-sun: oklch(0.92 0.12 90);
+  <!-- External CSS: Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-      --animate-float: float 7.5s ease-in-out infinite;
-      --animate-shift: shift 10s linear infinite;
-      --animate-pop: pop 160ms ease-out;
-      --animate-glow: glow 2.8s ease-in-out infinite;
-      --animate-reveal: reveal 600ms cubic-bezier(.2,.9,.2,1) both;
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800;900&display=swap" rel="stylesheet">
 
-      @keyframes float { 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-10px) } }
-      @keyframes shift { 0%{ background-position: 0% 50% } 100%{ background-position: 100% 50% } }
-      @keyframes pop { 0%{ transform:scale(.985); opacity:0 } 100%{ transform:scale(1); opacity:1 } }
-      @keyframes glow { 0%,100%{ opacity:.45 } 50%{ opacity:.85 } }
-      @keyframes reveal { 0%{ transform: translateY(14px); opacity:0 } 100%{ transform: translateY(0); opacity:1 } }
+  <!-- Tailwind theme config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ["Manrope", "system-ui", "sans-serif"] },
+          colors: {
+            selah: {
+              bg0: "#0b0b12",
+              bg1: "#0f0f1a",
+              rail: "#0a0a12",
+              chan: "#101026",
+              chat: "#0b0b12",
+              mem:  "#10101c",
+              stroke: "rgba(255,255,255,.10)",
+              text: "rgba(255,255,255,.92)",
+              muted: "rgba(255,255,255,.62)",
+              muted2:"rgba(255,255,255,.44)",
+              pink: "#ff3db8",
+              purple:"#b38cff",
+              aqua: "#7ae7ff"
+            }
+          },
+          boxShadow: {
+            glow: "0 0 24px rgba(255,61,184,.22)",
+            deep: "0 18px 70px rgba(0,0,0,.45)"
+          }
+        }
+      }
     }
-  </style>
+  </script>
 
-  <style>
-    /* stained-glass-ish overlay (pure CSS) */
-    .glass-overlay{
-      background-image:
-        radial-gradient(700px 340px at 15% 15%, rgba(14,165,233,.22), transparent 60%),
-        radial-gradient(700px 340px at 85% 25%, rgba(99,102,241,.20), transparent 60%),
-        radial-gradient(700px 340px at 45% 85%, rgba(34,197,94,.18), transparent 60%),
-        linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.75));
-    }
-    .pattern{
-      background-image:
-        linear-gradient(to right, rgba(2,6,23,.05) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(2,6,23,.05) 1px, transparent 1px);
-      background-size: 54px 54px;
-      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,.9), rgba(0,0,0,.2) 60%, transparent 75%);
-    }
-    .shine::before{
-      content:"";
-      position:absolute; inset:-1px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.65), transparent);
-      transform: translateX(-120%);
-      animation: shift 3.6s ease-in-out infinite;
-      opacity:.35;
-      pointer-events:none;
-      border-radius: 999px;
-    }
-    .reveal{
-      opacity:0;
-      transform: translateY(14px);
-    }
-    .reveal.is-in{
-      animation: reveal 650ms cubic-bezier(.2,.9,.2,1) both;
-    }
-  </style>
+  <link rel="stylesheet" href="./styles.css" />
+  <script defer src="./app.js"></script>
 </head>
 
-<body class="min-h-dvh bg-white text-slate-900">
-  <!-- Background -->
-  <div class="pointer-events-none fixed inset-0 -z-10">
-    <div class="absolute inset-0 glass-overlay"></div>
-    <div class="absolute inset-0 pattern opacity-55"></div>
+<body class="h-full overflow-hidden bg-gradient-to-b from-selah-bg0 to-selah-bg1 text-selah-text font-sans">
 
-    <!-- floating blobs -->
-    <div class="absolute -top-24 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full
-                bg-gradient-to-r from-sky-200 via-indigo-200 to-emerald-200 blur-3xl opacity-70
-                motion-safe:animate-float"></div>
-    <div class="absolute -bottom-40 -left-40 h-[520px] w-[520px] rounded-full
-                bg-gradient-to-tr from-amber-100 via-rose-100 to-sky-100 blur-3xl opacity-65
-                motion-safe:animate-float" style="animation-delay:-2.2s"></div>
+  <!-- Ambient background -->
+  <div class="bgfx" aria-hidden="true">
+    <div class="blob blob-a"></div>
+    <div class="blob blob-b"></div>
+    <div class="blob blob-c"></div>
+    <div class="noise"></div>
   </div>
 
-  <!-- Skip link -->
-  <a href="#main"
-     class="sr-only focus:not-sr-only fixed left-4 top-4 z-50 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold
-            focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-    Skip to content
-  </a>
+  <!-- Mobile topbar -->
+  <header class="md:hidden h-14 px-3 flex items-center justify-between border-b border-[color:var(--stroke)] bg-[rgba(10,10,18,.78)] backdrop-blur">
+    <button id="mOpenNav" class="iconbtn" aria-label="Open servers/channels">
+      <i class="bi bi-layout-sidebar-inset"></i>
+    </button>
 
-  <!-- Top bar -->
-  <header class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-7">
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <a href="index.html" class="group inline-flex items-center gap-3">
-        <!-- Icon -->
-        <span class="relative grid h-11 w-11 place-items-center rounded-2xl bg-slate-900 text-white shadow-sm">
-          <!-- Selah mark: pause + cross, brighter -->
-          <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
-            <defs>
-              <linearGradient id="g" x1="0" x2="1">
-                <stop offset="0" stop-color="#38bdf8"/>
-                <stop offset="0.5" stop-color="#6366f1"/>
-                <stop offset="1" stop-color="#22c55e"/>
-              </linearGradient>
-            </defs>
-            <rect x="3" y="4" width="4" height="14" rx="2" fill="url(#g)"/>
-            <rect x="9" y="4" width="4" height="14" rx="2" fill="url(#g)"/>
-            <path d="M17 5v12" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".88"/>
-            <path d="M14.6 11h4.8" stroke="white" stroke-width="2.5" stroke-linecap="round" opacity=".88"/>
-          </svg>
-          <span class="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-white"></span>
-        </span>
-
-        <span class="leading-tight">
-          <span class="block text-lg font-semibold tracking-tight">Selah</span>
-          <span class="block text-sm text-slate-600">Student Christian Club</span>
-        </span>
-      </a>
-
-      <nav class="flex flex-wrap items-center gap-2 text-sm">
-        <a class="rounded-full border border-slate-200 bg-white/80 backdrop-blur px-4 py-2 hover:bg-white transition
-                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" href="#what">
-          What we do
-        </a>
-        <a class="rounded-full border border-slate-200 bg-white/80 backdrop-blur px-4 py-2 hover:bg-white transition
-                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" href="#meet">
-          Meetings
-        </a>
-        <a class="rounded-full border border-slate-200 bg-white/80 backdrop-blur px-4 py-2 hover:bg-white transition
-                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" href="#join">
-          Join
-        </a>
-        <a class="rounded-full bg-slate-900 px-4 py-2 text-white hover:bg-slate-800 transition
-                  focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" href="lounge.html">
-          Lounge →
-        </a>
-      </nav>
+    <div class="min-w-0 text-center">
+      <div id="mServerName" class="font-black text-sm truncate">Selah</div>
+      <div id="mChannelName" class="font-extrabold text-xs text-[color:var(--muted)] truncate"># select-a-channel</div>
     </div>
+
+    <button id="mOpenMembers" class="iconbtn" aria-label="Open members">
+      <i class="bi bi-people"></i>
+    </button>
   </header>
 
-  <main id="main" class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pb-16 pt-10">
-
-    <!-- HERO -->
-    <section class="reveal grid gap-10 lg:grid-cols-2 lg:items-center">
-      <div>
-        <div class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-sm text-slate-700 backdrop-blur">
-          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-          calm • real • student-led
-          <span class="mx-1 h-1 w-1 rounded-full bg-slate-300"></span>
-          <span class="text-slate-500">club-first (not a chat app)</span>
-        </div>
-
-        <h1 class="mt-5 text-4xl sm:text-5xl font-semibold tracking-tight">
-          A brighter place to
-          <span class="bg-gradient-to-r from-sky-600 via-indigo-600 to-emerald-600 bg-clip-text text-transparent
-                       bg-[length:200%_200%] motion-safe:animate-shift motion-reduce:animate-none">
-            pause
-          </span>
-          and grow.
-        </h1>
-
-        <p class="mt-4 max-w-prose text-base/7 text-slate-700">
-          Selah is a student Christian club for teens who want a safe, chill space at school to talk about faith and real life.
-          You can show up to listen, share, or just breathe.
-        </p>
-
-        <div class="mt-7 flex flex-col gap-3 sm:flex-row">
-          <button id="openJoin"
-            class="relative overflow-hidden inline-flex items-center justify-center gap-2 rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white
-                   shadow-sm hover:shadow-md hover:-translate-y-0.5 transition active:translate-y-0 active:scale-[.99]
-                   focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-            <span class="relative z-10">Join Selah</span>
-            <span class="relative z-10">✨</span>
-            <span class="absolute inset-0 shine"></span>
-          </button>
-
-          <a href="#what"
-            class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/90 px-5 py-3 text-sm font-semibold
-                   hover:bg-white hover:-translate-y-0.5 transition active:translate-y-0 active:scale-[.99] backdrop-blur
-                   focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-            What we do
-            <span>↓</span>
-          </a>
-        </div>
-
-        <div class="mt-6 grid gap-3 sm:grid-cols-3">
-          <div class="rounded-2xl border border-slate-200 bg-white/85 p-4 backdrop-blur">
-            <div class="text-xs font-semibold text-slate-500">VIBE</div>
-            <div class="mt-1 font-semibold">No pressure</div>
-            <div class="mt-1 text-xs text-slate-600">listen or talk</div>
-          </div>
-          <div class="rounded-2xl border border-slate-200 bg-white/85 p-4 backdrop-blur">
-            <div class="text-xs font-semibold text-slate-500">FOCUS</div>
-            <div class="mt-1 font-semibold">Jesus + life</div>
-            <div class="mt-1 text-xs text-slate-600">real convos</div>
-          </div>
-          <div class="rounded-2xl border border-slate-200 bg-white/85 p-4 backdrop-blur">
-            <div class="text-xs font-semibold text-slate-500">FORMAT</div>
-            <div class="mt-1 font-semibold">Short topic</div>
-            <div class="mt-1 text-xs text-slate-600">then talk</div>
-          </div>
-        </div>
-
-        <p class="mt-3 text-xs text-slate-500">
-          Meeting day / room / sponsor: <span class="font-semibold">unspecified</span> (edit below).
-        </p>
+  <!-- App grid -->
+  <div class="appgrid">
+    <!-- Server Rail -->
+    <aside class="rail hidden md:flex">
+      <div class="railTop">
+        <button class="srvBtn srvBtnActive" data-home title="Selah Home">
+          <span class="srvMark">S</span>
+        </button>
       </div>
 
-      <!-- HERO CARD: verse + countdown -->
-      <div class="reveal relative">
-        <div class="rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-          <div class="flex items-start justify-between gap-4">
-            <div>
-              <div class="text-xs font-semibold text-slate-500">VERSE OF THE WEEK</div>
-              <div id="verseText" class="mt-2 text-lg font-semibold tracking-tight text-slate-900">
-                “Be still, and know that I am God.”
-              </div>
-              <div id="verseRef" class="mt-1 text-sm text-slate-600">Psalm 46:10</div>
-            </div>
-            <span class="rounded-2xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white">
-              SELAH
-            </span>
-          </div>
+      <div id="serverRail" class="railList"></div>
 
-          <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <div class="flex items-center justify-between">
-              <div class="text-xs font-semibold text-slate-500">NEXT MEETING</div>
-              <div class="text-xs text-slate-500" id="meetingLabel">Unspecified</div>
-            </div>
-            <div class="mt-2 flex items-center justify-between">
-              <div class="text-sm text-slate-700">Countdown</div>
-              <div class="text-sm font-semibold text-slate-900" id="countdown">—</div>
-            </div>
-            <div class="mt-3 h-2 w-full rounded-full bg-slate-200 overflow-hidden">
-              <div id="cdBar" class="h-full w-[20%] rounded-full bg-gradient-to-r from-sky-500 via-indigo-500 to-emerald-500"></div>
-            </div>
-            <div class="mt-2 text-xs text-slate-500">
-              This is a demo countdown (set your real meeting day/time in the JS).
-            </div>
-          </div>
-
-          <div class="mt-5 flex flex-wrap gap-2">
-            <button id="copyPoster"
-              class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold hover:bg-slate-50 transition
-                     focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-              📋 Copy poster line
-            </button>
-            <a href="lounge.html"
-              class="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 transition
-                     focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-              Open Lounge →
-            </a>
-          </div>
-        </div>
-
-        <div class="pointer-events-none absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-r from-sky-100 via-indigo-100 to-emerald-100 blur-2xl opacity-80"></div>
+      <div class="railBot">
+        <button id="btnAddServer" class="srvBtn srvBtnGhost" title="Add server (demo)">
+          <i class="bi bi-plus-lg"></i>
+        </button>
+        <button id="btnResetAll" class="srvBtn srvBtnGhost" title="Reset local data">
+          <i class="bi bi-arrow-counterclockwise"></i>
+        </button>
       </div>
-    </section>
+    </aside>
 
-    <!-- WHAT WE DO -->
-    <section id="what" class="mt-14">
-      <div class="reveal flex items-end justify-between gap-6">
-        <div>
-          <h2 class="text-2xl font-semibold tracking-tight">What we do</h2>
-          <p class="mt-2 max-w-prose text-base/7 text-slate-700">
-            Selah isn’t a “perfect people” club. It’s a place to be honest, learn, and encourage each other.
-          </p>
+    <!-- Channels -->
+    <aside class="channels hidden md:flex">
+      <div class="chanHead">
+        <div class="min-w-0">
+          <div id="serverTitle" class="font-black text-sm tracking-tight truncate">Selah (Sanctuary)</div>
+          <div class="text-xs font-extrabold text-[color:var(--muted)] truncate">night calls • prayer • christian talk</div>
         </div>
-        <div class="hidden sm:flex items-center gap-2 text-xs text-slate-600">
-          <span class="inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
-          welcoming
-        </div>
-      </div>
-
-      <div class="mt-6 grid gap-4 md:grid-cols-3">
-        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm
-                    transition hover:-translate-y-1 hover:shadow-md">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500">WEEKLY</span>
-            <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">chill</span>
-          </div>
-          <div class="mt-3 text-lg font-semibold">Short topic + real conversation</div>
-          <p class="mt-2 text-sm/7 text-slate-700">
-            We pick something real (stress, habits, identity, relationships) and connect it to Scripture.
-          </p>
-        </div>
-
-        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm
-                    transition hover:-translate-y-1 hover:shadow-md">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500">OPTIONAL</span>
-            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">safe</span>
-          </div>
-          <div class="mt-3 text-lg font-semibold">Prayer requests</div>
-          <p class="mt-2 text-sm/7 text-slate-700">
-            You can share out loud or write it down. No last names, no private details.
-          </p>
-        </div>
-
-        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm
-                    transition hover:-translate-y-1 hover:shadow-md">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500">ALWAYS</span>
-            <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-700">growth</span>
-          </div>
-          <div class="mt-3 text-lg font-semibold">Encouragement</div>
-          <p class="mt-2 text-sm/7 text-slate-700">
-            We try to leave people better than we found them: kindness, truth, hope.
-          </p>
-        </div>
-      </div>
-
-      <!-- SELAH MOMENT -->
-      <div class="reveal mt-6 rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div class="text-xs font-semibold text-slate-500">A SELAH MOMENT</div>
-            <div class="mt-2 text-lg font-semibold tracking-tight">60 seconds of silence</div>
-            <p class="mt-1 text-sm text-slate-700">Just to reset your mind before we talk.</p>
-          </div>
-          <div class="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white">
-            “pause” > “perform”
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- MEETINGS -->
-    <section id="meet" class="mt-14">
-      <div class="reveal">
-        <h2 class="text-2xl font-semibold tracking-tight">Meetings</h2>
-        <p class="mt-2 text-sm/7 text-slate-700">
-          Update these once you know the details.
-        </p>
-      </div>
-
-      <div class="mt-6 grid gap-4 lg:grid-cols-3">
-        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-          <div class="text-xs font-semibold text-slate-500">DAY</div>
-          <div id="mDay" class="mt-2 text-lg font-semibold">Unspecified</div>
-        </div>
-        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-          <div class="text-xs font-semibold text-slate-500">ROOM</div>
-          <div id="mRoom" class="mt-2 text-lg font-semibold">Unspecified</div>
-        </div>
-        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-          <div class="text-xs font-semibold text-slate-500">SPONSOR</div>
-          <div id="mSponsor" class="mt-2 text-lg font-semibold">Unspecified</div>
-        </div>
-      </div>
-
-      <!-- mini timeline -->
-      <div class="reveal mt-6 rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-        <div class="flex items-center justify-between">
-          <div class="text-lg font-semibold">Typical meeting flow</div>
-          <div class="text-xs text-slate-600">~25–35 min</div>
-        </div>
-        <div class="mt-5 grid gap-3 md:grid-cols-4">
-          <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
-            <div class="text-xs font-semibold text-slate-500">01</div>
-            <div class="mt-1 font-semibold">Selah moment</div>
-            <div class="mt-1 text-xs text-slate-600">silence / breath</div>
-          </div>
-          <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
-            <div class="text-xs font-semibold text-slate-500">02</div>
-            <div class="mt-1 font-semibold">Topic</div>
-            <div class="mt-1 text-xs text-slate-600">short + real</div>
-          </div>
-          <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
-            <div class="text-xs font-semibold text-slate-500">03</div>
-            <div class="mt-1 font-semibold">Talk</div>
-            <div class="mt-1 text-xs text-slate-600">small groups</div>
-          </div>
-          <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
-            <div class="text-xs font-semibold text-slate-500">04</div>
-            <div class="mt-1 font-semibold">Wrap</div>
-            <div class="mt-1 text-xs text-slate-600">prayer optional</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- JOIN -->
-    <section id="join" class="mt-14">
-      <div class="reveal">
-        <h2 class="text-2xl font-semibold tracking-tight">Join Selah</h2>
-        <p class="mt-2 max-w-prose text-base/7 text-slate-700">
-          Pick a nickname (first name only). It saves on this device and shows in the Lounge demo.
-        </p>
-      </div>
-
-      <div class="mt-6 grid gap-4 lg:grid-cols-3">
-        <div class="reveal lg:col-span-2 rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-          <label class="text-sm font-semibold" for="nick">Nickname</label>
-          <div class="mt-2 flex flex-col gap-3 sm:flex-row">
-            <input id="nick" maxlength="18" autocomplete="off" placeholder="e.g., Jordan"
-              class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none
-                     focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" />
-            <button id="saveNick"
-              class="relative overflow-hidden inline-flex items-center justify-center rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white
-                     hover:bg-slate-800 transition hover:-translate-y-0.5 active:translate-y-0 active:scale-[.99]
-                     focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-              Save
-            </button>
-          </div>
-
-          <div id="toast"
-            class="mt-4 hidden rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900"
-            role="status" aria-live="polite">
-            Saved 🙂
-          </div>
-
-          <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-            <div class="font-semibold">Quick rules</div>
-            <div class="mt-1 text-slate-600">No last names • No personal info • School-appropriate • Be kind</div>
-          </div>
-        </div>
-
-        <div class="reveal rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-          <div class="text-xs font-semibold text-slate-500">NEXT STEP</div>
-          <div class="mt-2 text-lg font-semibold">Open the Lounge</div>
-          <p class="mt-2 text-sm/7 text-slate-700">
-            The Lounge is a secondary tool for notes/prayer/wins (local demo).
-          </p>
-          <a href="lounge.html"
-             class="mt-4 inline-flex w-full items-center justify-center rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white
-                    hover:opacity-95 transition hover:-translate-y-0.5 active:translate-y-0 active:scale-[.99]
-                    focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-            Go to Lounge →
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="mt-14">
-      <div class="reveal">
-        <h2 class="text-2xl font-semibold tracking-tight">FAQ</h2>
-        <p class="mt-2 text-sm text-slate-700">Quick answers for people at the club fair.</p>
-      </div>
-
-      <div class="mt-6 grid gap-4 lg:grid-cols-2">
-        <details class="reveal group rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-          <summary class="cursor-pointer list-none flex items-center justify-between font-semibold">
-            Do I have to talk?
-            <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
-          </summary>
-          <p class="mt-3 text-sm/7 text-slate-700">
-            Nope. You can just listen. You won’t get called out.
-          </p>
-        </details>
-
-        <details class="reveal group rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-          <summary class="cursor-pointer list-none flex items-center justify-between font-semibold">
-            What if I’m not sure what I believe?
-            <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
-          </summary>
-          <p class="mt-3 text-sm/7 text-slate-700">
-            You’re welcome. Questions are normal here.
-          </p>
-        </details>
-
-        <details class="reveal group rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-          <summary class="cursor-pointer list-none flex items-center justify-between font-semibold">
-            Is this mostly a chat site?
-            <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
-          </summary>
-          <p class="mt-3 text-sm/7 text-slate-700">
-            No — the homepage is the main thing. The Lounge is just a small tool (notes/prayer/wins).
-          </p>
-        </details>
-
-        <details class="reveal group rounded-3xl border border-slate-200 bg-white/85 backdrop-blur p-6 shadow-sm">
-          <summary class="cursor-pointer list-none flex items-center justify-between font-semibold">
-            What’s “Selah” mean?
-            <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
-          </summary>
-          <p class="mt-3 text-sm/7 text-slate-700">
-            It’s a pause—like a breath in music or Psalms. We use it as a reminder to slow down.
-          </p>
-        </details>
-      </div>
-    </section>
-
-    <footer class="mt-16 text-xs text-slate-500">
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <p>© <span id="year"></span> Selah</p>
         <div class="flex items-center gap-2">
-          <button id="openJoin2" class="underline decoration-sky-300 underline-offset-4 hover:text-slate-700">Join</button>
-          <span class="text-slate-300">•</span>
-          <a class="underline decoration-sky-300 underline-offset-4 hover:text-slate-700" href="lounge.html">Lounge</a>
+          <button id="btnInvite" class="miniIcon" title="Invite (demo)"><i class="bi bi-share"></i></button>
+          <button id="btnNewChannel" class="miniIcon" title="Create channel"><i class="bi bi-plus-lg"></i></button>
         </div>
       </div>
-    </footer>
-  </main>
 
-  <!-- JOIN MODAL -->
-  <div id="joinModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-slate-900/35 backdrop-blur-sm"></div>
-    <div class="relative w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
-      <div class="flex items-start justify-between gap-4">
+      <div class="chanSearch">
+        <i class="bi bi-search"></i>
+        <input id="chanSearch" placeholder="Find a channel…" />
+      </div>
+
+      <div id="chanTree" class="chanTree"></div>
+
+      <!-- Voice / status bar (Discord-ish) -->
+      <div class="statusBar">
+        <div class="flex items-center gap-2 min-w-0">
+          <div id="meAvatar" class="avatar">?</div>
+          <div class="min-w-0">
+            <div id="meName" class="font-black text-xs truncate">Guest</div>
+            <div id="meStatus" class="text-[11px] font-extrabold text-[color:var(--muted)] truncate">Not connected</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnConnect" class="miniIcon glow" title="Connect"><i class="bi bi-plug"></i></button>
+          <button id="btnRules" class="miniIcon" title="Rules"><i class="bi bi-shield-check"></i></button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Chat -->
+    <main class="chat">
+      <div class="chatHead">
+        <div class="min-w-0">
+          <div class="flex items-center gap-2 min-w-0">
+            <span id="chanIcon" class="text-[color:var(--muted)] font-black">#</span>
+            <div id="activeChanName" class="font-black truncate">select-a-channel</div>
+            <span id="pillState" class="pill">Preview</span>
+            <span id="pillLock" class="pill pillGhost hidden">Locked</span>
+          </div>
+          <div id="activeChanTopic" class="topic">Pick a channel on the left.</div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap justify-end">
+          <button id="btnJoin" class="btnPrimary" disabled><i class="bi bi-box-arrow-in-right"></i> Join</button>
+          <button id="btnBottom" class="btnGhost" title="Bottom"><i class="bi bi-arrow-down"></i></button>
+          <button id="btnCommands" class="btnGhost" title="Commands"><i class="bi bi-terminal"></i></button>
+        </div>
+      </div>
+
+      <div id="banner" class="banner hidden">
+        <div class="min-w-0">
+          <div class="font-black flex items-center gap-2"><i class="bi bi-eye"></i> Preview mode</div>
+          <div class="text-xs font-extrabold text-[color:var(--muted)] truncate">Join to chat. Voice channels are UI-only until you add backend/WebRTC.</div>
+        </div>
+        <button id="btnJoinBanner" class="btnPrimary btnSmall">Join</button>
+      </div>
+
+      <div id="msgList" class="msgList"></div>
+
+      <div class="composer">
+        <div class="compLeft">
+          <div class="label">Display name</div>
+          <input id="displayName" class="field" maxlength="20" placeholder="ex: Lukas" />
+          <div class="hintTiny">Connect first, then join channels.</div>
+        </div>
+
+        <div class="compMid">
+          <textarea id="msgInput" rows="1" class="field fieldArea" placeholder="Connect + join to send messages…" disabled></textarea>
+          <div class="cmdHints">
+            <span class="kbd">/amen</span>
+            <span class="kbd">/prayer</span>
+            <span class="kbd">/verse</span>
+            <span class="kbd">/peace</span>
+            <span class="kbd">/clear</span>
+          </div>
+        </div>
+
+        <div class="compRight">
+          <button id="btnSend" class="btnPrimary w-full" disabled><i class="bi bi-send"></i> Send</button>
+          <button id="btnClear" class="btnGhost w-full"><i class="bi bi-trash"></i> Clear</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Members -->
+    <aside class="members hidden md:flex">
+      <div class="memHead">
+        <div class="font-black flex items-center gap-2"><i class="bi bi-people"></i> Members</div>
+        <div id="memCount" class="text-xs font-extrabold text-[color:var(--muted)]">—</div>
+      </div>
+
+      <div id="memList" class="memList"></div>
+
+      <div class="memFoot">
+        <div class="ruleCard">
+          <div class="font-black">Rules</div>
+          <ul class="ruleList">
+            <li>Be kind + Christlike. No drama.</li>
+            <li>Keep it clean. No sexual content.</li>
+            <li>No hate/harassment/threats.</li>
+            <li>No private info / doxxing.</li>
+            <li>Prayer requests stay private.</li>
+          </ul>
+          <div class="flex gap-2 mt-2">
+            <button id="btnCopyRules" class="btnGhost btnSmall w-full"><i class="bi bi-copy"></i> Copy</button>
+            <button id="btnReport" class="btnGhost btnSmall w-full"><i class="bi bi-flag"></i> Report</button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Mobile slide panels -->
+  <div id="mBackdrop" class="mBackdrop hidden"></div>
+
+  <section id="mNav" class="mPanel hidden" aria-hidden="true">
+    <div class="mPanelHead">
+      <div class="font-black flex items-center gap-2"><i class="bi bi-layout-sidebar-inset"></i> Selah</div>
+      <button id="mCloseNav" class="iconbtn" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <div class="mBlock">
+      <div class="mLabel">Servers</div>
+      <div id="mServers" class="mServers"></div>
+    </div>
+
+    <div class="mBlock">
+      <div class="mLabel">Channels</div>
+      <div class="chanSearch">
+        <i class="bi bi-search"></i>
+        <input id="chanSearchM" placeholder="Find a channel…" />
+      </div>
+      <div id="chanTreeM" class="chanTree"></div>
+      <div class="flex gap-2 mt-3">
+        <button id="btnNewChannelM" class="btnPrimary w-full"><i class="bi bi-plus-lg"></i> Create</button>
+        <button id="btnConnectM" class="btnGhost w-full"><i class="bi bi-plug"></i> Connect</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="mMembers" class="mPanelRight hidden" aria-hidden="true">
+    <div class="mPanelHead">
+      <div class="font-black flex items-center gap-2"><i class="bi bi-people"></i> Members</div>
+      <button id="mCloseMembers" class="iconbtn" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div id="memListM" class="memList p-3"></div>
+  </section>
+
+  <!-- Create Channel Modal -->
+  <div id="modal" class="modal hidden" aria-hidden="true">
+    <div class="modalCard">
+      <div class="flex items-center justify-between">
+        <div class="font-black text-base">Create channel</div>
+        <button id="modalClose" class="miniIcon" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
         <div>
-          <div class="text-xs font-semibold text-slate-500">JOIN SELAH</div>
-          <div class="mt-1 text-xl font-semibold tracking-tight">Quick setup</div>
-          <p class="mt-2 text-sm text-slate-700">Pick a nickname (first name only). Saved on this device.</p>
+          <div class="label">Name</div>
+          <input id="newName" class="field" maxlength="28" placeholder="ex: prayer-requests" />
         </div>
-        <button id="closeJoin"
-          class="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold hover:bg-slate-50 transition
-                 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">✕</button>
+        <div>
+          <div class="label">Type</div>
+          <select id="newType" class="field">
+            <option value="text">Text (#)</option>
+            <option value="voice">Voice (🔊)</option>
+          </select>
+        </div>
       </div>
 
-      <div class="mt-5 grid gap-3">
-        <label class="text-sm font-semibold" for="nickModal">Nickname</label>
-        <input id="nickModal" maxlength="18" placeholder="e.g., Jordan"
-          class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none
-                 focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2" />
+      <div class="mt-3">
+        <div class="label">Topic</div>
+        <textarea id="newTopic" rows="3" class="field fieldArea" maxlength="140" placeholder="What’s this channel for?"></textarea>
+      </div>
 
-        <div class="flex gap-2">
-          <button id="saveNickModal"
-            class="flex-1 rounded-2xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:opacity-95 transition
-                   focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-            Save
-          </button>
-          <a href="lounge.html"
-            class="flex-1 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-800 transition text-center
-                   focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-sky-100 focus-visible:ring-offset-2">
-            Lounge →
-          </a>
+      <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+        <div>
+          <div class="label">Optional passcode</div>
+          <input id="newPass" class="field" maxlength="12" placeholder="blank = public" />
         </div>
+        <div class="text-xs font-extrabold text-[color:var(--muted)]">
+          Locked channels ask for passcode when joining.
+        </div>
+      </div>
 
-        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
-          Rule: no last names • no personal info • be kind
-        </div>
+      <div class="mt-4 flex gap-2 justify-end">
+        <button id="modalCancel" class="btnGhost"><i class="bi bi-x-circle"></i> Cancel</button>
+        <button id="modalCreate" class="btnPrimary"><i class="bi bi-check2"></i> Create</button>
       </div>
     </div>
   </div>
 
-  <!-- tiny toast -->
-  <div id="tinyToast"
-       class="fixed left-1/2 bottom-5 z-50 hidden -translate-x-1/2 rounded-2xl bg-slate-900 px-4 py-3 text-xs font-semibold text-white shadow-lg">
-    Copied ✅
+  <!-- Commands Modal -->
+  <div id="cmdModal" class="modal hidden" aria-hidden="true">
+    <div class="modalCard">
+      <div class="flex items-center justify-between">
+        <div class="font-black text-base">Commands</div>
+        <button id="cmdClose" class="miniIcon" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+      </div>
+      <div class="mt-3 cardish">
+        <div class="font-black">Chat</div>
+        <div class="mt-2 flex flex-wrap gap-2">
+          <span class="kbd">/amen</span>
+          <span class="kbd">/peace</span>
+          <span class="kbd">/verse</span>
+          <span class="kbd">/prayer your request</span>
+          <span class="kbd">/clear</span>
+        </div>
+        <div class="mt-2 text-xs font-extrabold text-[color:var(--muted)]">
+          Front-end demo: saved in localStorage.
+        </div>
+      </div>
+      <div class="mt-3 cardish">
+        <div class="font-black">Voice channels</div>
+        <div class="mt-2 text-xs font-extrabold text-[color:var(--muted)]">
+          This build is UI-only. Real sleep calls need WebRTC/backend.
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end">
+        <button id="cmdOk" class="btnPrimary"><i class="bi bi-check2"></i> Ok</button>
+      </div>
+    </div>
   </div>
 
-  <script>
-    // -----------------------------
-    // Scroll reveal
-    // -----------------------------
-    const revealEls = [...document.querySelectorAll(".reveal")];
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) e.target.classList.add("is-in");
-      });
-    }, { threshold: 0.14 });
-    revealEls.forEach(el => io.observe(el));
+  <!-- Toast -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-    // -----------------------------
-    // Nick storage
-    // -----------------------------
-    const KEY_NICK = "selah:nick";
-    const nick = document.getElementById("nick");
-    const saveNick = document.getElementById("saveNick");
-    const toast = document.getElementById("toast");
-
-    function loadNick(){
-      const v = (localStorage.getItem(KEY_NICK) || "").trim().slice(0,18);
-      if (nick) nick.value = v;
-      const nm = document.getElementById("nickModal");
-      if (nm) nm.value = v;
-      return v;
-    }
-    function showToast(el){
-      el.classList.remove("hidden");
-      setTimeout(() => el.classList.add("hidden"), 1400);
-    }
-    loadNick();
-
-    saveNick?.addEventListener("click", () => {
-      const v = (nick.value || "").trim().slice(0,18);
-      localStorage.setItem(KEY_NICK, v);
-      showToast(toast);
-    });
-
-    // -----------------------------
-    // Join modal
-    // -----------------------------
-    const joinModal = document.getElementById("joinModal");
-    const openJoin = document.getElementById("openJoin");
-    const openJoin2 = document.getElementById("openJoin2");
-    const closeJoin = document.getElementById("closeJoin");
-    const saveNickModal = document.getElementById("saveNickModal");
-    const nickModal = document.getElementById("nickModal");
-
-    function openModal(){
-      joinModal.classList.remove("hidden");
-      joinModal.classList.add("flex");
-      loadNick();
-      setTimeout(() => nickModal?.focus(), 30);
-    }
-    function closeModal(){
-      joinModal.classList.add("hidden");
-      joinModal.classList.remove("flex");
-    }
-    openJoin?.addEventListener("click", openModal);
-    openJoin2?.addEventListener("click", openModal);
-    closeJoin?.addEventListener("click", closeModal);
-    joinModal?.addEventListener("click", (e) => {
-      if (e.target === joinModal) closeModal();
-    });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !joinModal.classList.contains("hidden")) closeModal();
-    });
-
-    saveNickModal?.addEventListener("click", () => {
-      const v = (nickModal.value || "").trim().slice(0,18);
-      localStorage.setItem(KEY_NICK, v);
-      loadNick();
-      closeModal();
-    });
-
-    // -----------------------------
-    // Verse rotator (simple + clean)
-    // -----------------------------
-    const verses = [
-      { t: "“Be still, and know that I am God.”", r: "Psalm 46:10" },
-      { t: "“Do not be anxious about anything…”", r: "Philippians 4:6" },
-      { t: "“Come to me… and I will give you rest.”", r: "Matthew 11:28" },
-      { t: "“The Lord is my shepherd; I shall not want.”", r: "Psalm 23:1" },
-    ];
-    const verseText = document.getElementById("verseText");
-    const verseRef = document.getElementById("verseRef");
-    let verseIndex = 0;
-
-    setInterval(() => {
-      verseIndex = (verseIndex + 1) % verses.length;
-      if (!verseText || !verseRef) return;
-      verseText.style.opacity = 0;
-      verseRef.style.opacity = 0;
-      setTimeout(() => {
-        verseText.textContent = verses[verseIndex].t;
-        verseRef.textContent = verses[verseIndex].r;
-        verseText.style.opacity = 1;
-        verseRef.style.opacity = 1;
-      }, 160);
-    }, 6500);
-
-    // -----------------------------
-    // Countdown demo (set real meeting time later)
-    // -----------------------------
-    const meetingLabel = document.getElementById("meetingLabel");
-    const countdown = document.getElementById("countdown");
-    const cdBar = document.getElementById("cdBar");
-
-    // Demo target: next Friday 12:00 (local device time)
-    function nextFridayNoon(){
-      const now = new Date();
-      const d = new Date(now);
-      const day = d.getDay(); // 0 Sun ... 5 Fri
-      const daysToFri = (5 - day + 7) % 7 || 7;
-      d.setDate(d.getDate() + daysToFri);
-      d.setHours(12,0,0,0);
-      return d;
-    }
-
-    const target = nextFridayNoon();
-    meetingLabel.textContent = "Demo: Friday @ 12:00";
-
-    function fmt(ms){
-      const s = Math.max(0, Math.floor(ms/1000));
-      const dd = Math.floor(s/86400);
-      const hh = Math.floor((s%86400)/3600);
-      const mm = Math.floor((s%3600)/60);
-      if (dd > 0) return `${dd}d ${hh}h ${mm}m`;
-      return `${hh}h ${mm}m`;
-    }
-
-    const total = target - new Date();
-    function tick(){
-      const now = new Date();
-      const diff = target - now;
-      countdown.textContent = diff <= 0 ? "Now ✅" : fmt(diff);
-
-      // progress bar (purely visual)
-      const pct = total > 0 ? Math.max(6, Math.min(100, 100 - (diff/total)*100)) : 100;
-      cdBar.style.width = pct.toFixed(0) + "%";
-    }
-    tick();
-    setInterval(tick, 1000);
-
-    // -----------------------------
-    // Copy poster line
-    // -----------------------------
-    const tinyToast = document.getElementById("tinyToast");
-    async function copyText(t){
-      try{
-        await navigator.clipboard.writeText(t);
-      }catch{
-        const ta = document.createElement("textarea");
-        ta.value = t;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        ta.remove();
-      }
-      tinyToast.classList.remove("hidden");
-      setTimeout(()=> tinyToast.classList.add("hidden"), 1200);
-    }
-
-    document.getElementById("copyPoster")?.addEventListener("click", () => {
-      copyText("Selah (Christian Club) — Lunch • Room ___ • Sponsor ___ • Come as you are.");
-    });
-
-    // -----------------------------
-    // Meetings placeholders (easy edit later)
-    // -----------------------------
-    document.getElementById("mDay").textContent = "Unspecified";
-    document.getElementById("mRoom").textContent = "Unspecified";
-    document.getElementById("mSponsor").textContent = "Unspecified";
-
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
 </body>
-</html>
+        </html>
